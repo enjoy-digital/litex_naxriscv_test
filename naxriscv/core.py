@@ -137,21 +137,13 @@ class NaxRiscv(CPU):
             i_peripheral_dbus_rresp   = dbus.r.resp,
         )
 
-        # Debug: Early Finish.
-        finish_cnt = Signal(32, reset=1000)
-        self.sync += [
-            finish_cnt.eq(finish_cnt - 1),
-            If(finish_cnt == 0,
-                Finish()
-            )
-        ]
-
     def set_reset_address(self, reset_address):
         self.reset_address = reset_address
         assert reset_address == 0x00000000
 
     def add_sources(self, platform):
         platform.add_source("NaxRiscvLitex.v") # FIXME: Create pythondata-cpu-naxriscv once working.
+        platform.add_source("RamXilinx.v")
 
     def add_soc_components(self, soc, soc_region_cls):
         # Define ISA.
