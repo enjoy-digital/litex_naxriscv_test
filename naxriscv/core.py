@@ -32,7 +32,7 @@ CPU_VARIANTS = {
 class NaxRiscv(CPU):
     family               = "riscv"
     name                 = "naxriscv"
-    human_name           = "naxriscv"
+    human_name           = "NaxRiscv"
     variants             = CPU_VARIANTS
     data_width           = 32
     endianness           = "little"
@@ -71,6 +71,7 @@ class NaxRiscv(CPU):
             "sram":     0x10000000,
             "main_ram": 0x40000000,
             "csr":      0xf0000000,
+            "clint":    0xf0010000,
             "plic":     0xf0c00000,
         }
 
@@ -85,7 +86,7 @@ class NaxRiscv(CPU):
     def __init__(self, platform, variant):
         self.platform         = platform
         self.variant          = "standard"
-        self.human_name       = self.human_name + "-" + variant.upper()
+        self.human_name       = self.human_name
         self.reset            = Signal()
         self.interrupt        = Signal(32)
         self.ibus             = ibus = axi.AXILiteInterface(address_width=32, data_width=32)
@@ -109,7 +110,7 @@ class NaxRiscv(CPU):
             o_peripheral_ibus_arvalid = ibus.ar.valid,
             i_peripheral_ibus_arready = ibus.ar.ready,
             o_peripheral_ibus_araddr  = ibus.ar.addr,
-            o_peripheral_ibus_arprot  = Open(), # CHECKME: Used by Nax?
+            o_peripheral_ibus_arprot  = Open(),
             i_peripheral_ibus_rvalid  = ibus.r.valid,
             o_peripheral_ibus_rready  = ibus.r.ready,
             i_peripheral_ibus_rdata   = ibus.r.data,
@@ -119,7 +120,7 @@ class NaxRiscv(CPU):
             o_peripheral_dbus_awvalid = dbus.aw.valid,
             i_peripheral_dbus_awready = dbus.aw.ready,
             o_peripheral_dbus_awaddr  = dbus.aw.addr,
-            o_peripheral_dbus_awprot  = Open(), # CHECKME: Used by Nax?
+            o_peripheral_dbus_awprot  = Open(),
             o_peripheral_dbus_wvalid  = dbus.w.valid,
             i_peripheral_dbus_wready  = dbus.w.ready,
             o_peripheral_dbus_wdata   = dbus.w.data,
@@ -130,7 +131,7 @@ class NaxRiscv(CPU):
             o_peripheral_dbus_arvalid = dbus.ar.valid,
             i_peripheral_dbus_arready = dbus.ar.ready,
             o_peripheral_dbus_araddr  = dbus.ar.addr,
-            o_peripheral_dbus_arprot  = Open(), # CHECKME: Used by Nax?
+            o_peripheral_dbus_arprot  = Open(),
             i_peripheral_dbus_rvalid  = dbus.r.valid,
             o_peripheral_dbus_rready  = dbus.r.ready,
             i_peripheral_dbus_rdata   = dbus.r.data,
