@@ -143,8 +143,9 @@ class NaxRiscv(CPU):
 
     def add_sources(self, platform):
         # FIXME: Create pythondata-cpu-naxriscv once working.
-        os.system("wget https://github.com/enjoy-digital/litex_naxriscv_test/files/8030295/NaxRiscvLitex.v.txt")
-        os.system("mv NaxRiscvLitex.v.txt NaxRiscvLitex.v")
+        if not os.path.exists("NaxRiscvLitex.v"):
+            os.system("wget https://github.com/enjoy-digital/litex_naxriscv_test/files/8030295/NaxRiscvLitex.v.txt")
+            os.system("mv NaxRiscvLitex.v.txt NaxRiscvLitex.v")
         platform.add_source("NaxRiscvLitex.v")
         platform.add_source("RamXilinx.v")
 
