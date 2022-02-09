@@ -142,7 +142,10 @@ class NaxRiscv(CPU):
         assert reset_address == 0x00000000
 
     def add_sources(self, platform):
-        platform.add_source("NaxRiscvLitex.v") # FIXME: Create pythondata-cpu-naxriscv once working.
+        # FIXME: Create pythondata-cpu-naxriscv once working.
+        os.system("wget https://github.com/enjoy-digital/litex_naxriscv_test/files/8030295/NaxRiscvLitex.v.txt")
+        os.system("mv NaxRiscvLitex.v.txt NaxRiscvLitex.v")
+        platform.add_source("NaxRiscvLitex.v")
         platform.add_source("RamXilinx.v")
 
     def add_soc_components(self, soc, soc_region_cls):
