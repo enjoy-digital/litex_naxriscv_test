@@ -151,6 +151,10 @@ class NaxRiscv(CPU):
         platform.add_source("RamXilinx.v")
 
     def add_soc_components(self, soc, soc_region_cls):
+        # Force CSR Mapping. FIXME.
+        soc.csr.add("timer0", n=7)
+        soc.csr.add("uart",   n=8)
+
         # Define ISA.
         soc.add_constant("CPU_ISA", NaxRiscv.get_arch())
 
