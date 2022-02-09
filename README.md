@@ -9,5 +9,5 @@ $ litex_sim --cpu-type=naxriscv --with-sdram --sdram-module=MT41K128M16 --sdram-
 [> Build/Run it on Arty
 -----------------------
 ````
-$ python3 -m litex_boards.targets.digilent_arty --cpu-type=naxriscv --build --load
+$ python3 -m litex_boards.targets.digilent_arty --cpu-type=naxriscv --with-ethernet --build --load
 ````
