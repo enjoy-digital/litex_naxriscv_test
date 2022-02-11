@@ -104,7 +104,7 @@ class NaxRiscv(CPU):
             i_reset = ResetSignal("sys") | self.reset,
 
             # Interrupt.
-            i_peripheral_interrupt = self.interrupt, # FIXME: Check what is expected.
+            i_peripheral_interrupt = self.interrupt, # FIXME: Check what is expected. => interrupt(0) is dummy and should not be used (PLIC stuff), need to reserve interrupt(0)
 
             # Peripheral Instruction Bus (AXI Lite Slave).
             o_peripheral_ibus_arvalid = ibus.ar.valid,
@@ -151,7 +151,6 @@ class NaxRiscv(CPU):
         platform.add_source("RamXilinx.v")
 
     def add_soc_components(self, soc, soc_region_cls):
-        # Force CSR Mapping. FIXME.
         soc.csr.add("uart",   n=2)
         soc.csr.add("timer0", n=3)
 
@@ -159,30 +158,54 @@ class NaxRiscv(CPU):
         soc.add_constant("CPU_ISA", NaxRiscv.get_arch())
 
         # Add PLIC Bus (Wishbone Slave).
-        self.plicbus = plicbus  = wishbone.Interface()
+        self.plicbus = plicbus  = axi.AXILiteInterface(address_width=32, data_width=32)
         self.cpu_params.update(
-            i_peripheral_plic_CYC       = plicbus.cyc,
-            i_peripheral_plic_STB       = plicbus.stb,
-            o_peripheral_plic_ACK       = plicbus.ack,
-            i_peripheral_plic_WE        = plicbus.we,
-            i_peripheral_plic_ADR       = plicbus.adr,
-            o_peripheral_plic_DAT_MISO  = plicbus.dat_r,
-            i_peripheral_plic_DAT_MOSI  = plicbus.dat_w
+            i_peripheral_plic_awvalid = plicbus.aw.valid,
+            o_peripheral_plic_awready = plicbus.aw.ready,
+            i_peripheral_plic_awaddr  = plicbus.aw.addr,
+            i_peripheral_plic_awprot  = Constant(2),
+            i_peripheral_plic_wvalid  = plicbus.w.valid,
+            o_peripheral_plic_wready  = plicbus.w.ready,
+            i_peripheral_plic_wdata   = plicbus.w.data,
+            i_peripheral_plic_wstrb   = plicbus.w.strb,
+            o_peripheral_plic_bvalid  = plicbus.b.valid,
+            i_peripheral_plic_bready  = plicbus.b.ready,
+            o_peripheral_plic_bresp   = plicbus.b.resp,
+            i_peripheral_plic_arvalid = plicbus.ar.valid,
+            o_peripheral_plic_arready = plicbus.ar.ready,
+            i_peripheral_plic_araddr  = plicbus.ar.addr,
+            i_peripheral_plic_arprot  = Constant(2),
+            o_peripheral_plic_rvalid  = plicbus.r.valid,
+            i_peripheral_plic_rready  = plicbus.r.ready,
+            o_peripheral_plic_rdata   = plicbus.r.data,
+            o_peripheral_plic_rresp   = plicbus.r.resp,
         )
-        soc.bus.add_slave("plic", self.plicbus, region=soc_region_cls(origin=soc.mem_map.get("plic"), size=0x400000, cached=False)) # FIXME: Check size.
+        soc.bus.add_slave("plic", self.plicbus, region=soc_region_cls(origin=soc.mem_map.get("plic"), size=0x400000, cached=False))
 
         # Add CLINT Bus (Wishbone Slave).
-        self.clintbus = clintbus = wishbone.Interface()
+        self.clintbus = clintbus = axi.AXILiteInterface(address_width=32, data_width=32)
         self.cpu_params.update(
-            i_peripheral_clint_CYC      = clintbus.cyc,
-            i_peripheral_clint_STB      = clintbus.stb,
-            o_peripheral_clint_ACK      = clintbus.ack,
-            i_peripheral_clint_WE       = clintbus.we,
-            i_peripheral_clint_ADR      = clintbus.adr,
-            o_peripheral_clint_DAT_MISO = clintbus.dat_r,
-            i_peripheral_clint_DAT_MOSI = clintbus.dat_w,
+            i_peripheral_clint_awvalid = clintbus.aw.valid,
+            o_peripheral_clint_awready = clintbus.aw.ready,
+            i_peripheral_clint_awaddr  = clintbus.aw.addr,
+            i_peripheral_clint_awprot  = Constant(2),
+            i_peripheral_clint_wvalid  = clintbus.w.valid,
+            o_peripheral_clint_wready  = clintbus.w.ready,
+            i_peripheral_clint_wdata   = clintbus.w.data,
+            i_peripheral_clint_wstrb   = clintbus.w.strb,
+            o_peripheral_clint_bvalid  = clintbus.b.valid,
+            i_peripheral_clint_bready  = clintbus.b.ready,
+            o_peripheral_clint_bresp   = clintbus.b.resp,
+            i_peripheral_clint_arvalid = clintbus.ar.valid,
+            o_peripheral_clint_arready = clintbus.ar.ready,
+            i_peripheral_clint_araddr  = clintbus.ar.addr,
+            i_peripheral_clint_arprot  = Constant(2),
+            o_peripheral_clint_rvalid  = clintbus.r.valid,
+            i_peripheral_clint_rready  = clintbus.r.ready,
+            o_peripheral_clint_rdata   = clintbus.r.data,
+            o_peripheral_clint_rresp   = clintbus.r.resp,
         )
-        soc.bus.add_slave("clint", clintbus, region=soc_region_cls(origin=soc.mem_map.get("clint"), size=0x10000, cached=False)) # FIXME: Check size.
+        soc.bus.add_slave("clint", clintbus, region=soc_region_cls(origin=soc.mem_map.get("clint"), size=0x10000, cached=False))
 
     def add_memory_buses(self, address_width, data_width):
         assert data_width == 128 # FIXME: For now only support Arty/DDR3 config, add NaxRiscv automatic generation.
@@ -192,12 +215,12 @@ class NaxRiscv(CPU):
         ibus = axi.AXIInterface(
             data_width    = data_width,
             address_width = 32,
-            id_width      = 8, # FIXME.
+            id_width      = 1, 
         )
         dbus = axi.AXIInterface(
             data_width    = data_width,
             address_width = 32,
-            id_width      = 8, # FIXME.
+            id_width      = 4,
         )
         self.memory_buses.append(ibus)
         self.memory_buses.append(dbus)
