@@ -152,8 +152,8 @@ class NaxRiscv(CPU):
 
     def add_soc_components(self, soc, soc_region_cls):
         # Force CSR Mapping. FIXME.
-        soc.csr.add("timer0", n=7)
-        soc.csr.add("uart",   n=8)
+        soc.csr.add("uart",   n=2)
+        soc.csr.add("timer0", n=3)
 
         # Define ISA.
         soc.add_constant("CPU_ISA", NaxRiscv.get_arch())
