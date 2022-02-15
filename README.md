@@ -15,7 +15,7 @@ $ python3 -m litex_boards.targets.digilent_arty --cpu-type=naxriscv --with-ether
 [> Build/Run it on Nexys-Video
 ------------------------------
 ````
-$ python3 -m litex_boards.targets.digilent_nexys_video --cpu-type=naxriscv --uart-name=usb_fifo --with-video-framebuffer --with-spi-sdcard --build --load
+$ python3 -m litex_boards.targets.digilent_nexys_video --cpu-type=naxriscv --uart-name=usb_fifo --with-video-framebuffer --with-sdcard --build --load
 ````
 
 [> Build/Run it on LiteX-Acorn-Baseboard
